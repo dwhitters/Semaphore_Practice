@@ -1,3 +1,11 @@
+/*******************************************************************
+ * @authors David Whitters and Jonah Bukowsky
+ * @date 2/22/18
+ *
+ * CIS 452
+ * Dr. Dulimarta
+ *******************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -9,16 +17,19 @@
 
 #define SIZE 16
 
-int main () {
+int main (int argc, char * argv[]) {
     int status;
     long int i, loop, temp, *shmPtr;
     int shmId;
     pid_t pid;
 
-    /*
-     * TODO: get value of loop variable(from command - line
-     * argument
-     */
+    /* Set loop to the value specified by user if there is only one cmdline arg. */
+    loop = (argc == 2) ? atoi(argv[1]) : 0;
+    if(0 == loop)
+    {
+        printf("\nNo loop value specified! Defaulted to zero.\n\n");
+    }
+
     if ((shmId = shmget (IPC_PRIVATE, SIZE,
                          IPC_CREAT | S_IRUSR | S_IWUSR)) < 0) {
         perror ("i can't get no..\n");
@@ -34,10 +45,10 @@ int main () {
 
     if (!(pid = fork ())) {
         for (i = 0; i < loop; i++) {
-
-            /*
-             * TODO: swap the contents of shmPtr[0] and  shmPtr[1]
-             */
+            /* Swap the contents of shmPtr[0] and  shmPtr[1] */
+            temp = shmPtr[0];
+            shmPtr[0] = shmPtr[1];
+            shmPtr[1] = temp;
         }
         if (shmdt (shmPtr) < 0) {
             perror ("just can 't let go\n");
@@ -47,10 +58,10 @@ int main () {
     }
     else {
         for (i = 0; i < loop; i++) {
-
-            /*
-             * TODO: swap the contents of shmPtr[1] and shmPtr[0]
-             */
+            /* Swap the contents of shmPtr[1] and shmPtr[0] */
+            temp = shmPtr[1];
+            shmPtr[1] = shmPtr[0];
+            shmPtr[0] = temp;
         }
     }
 
